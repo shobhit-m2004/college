@@ -164,8 +164,8 @@ const bookAppointment = async (req, res) => {
 
     const slots_booked = docData.slots_booked;
     if (slots_booked[slotDate]) {
-      if (slots_booked[slotDate].include(slotTime)) {
-        res.json({ success: false, message: err.message });
+      if (slots_booked[slotDate].includes(slotTime)) {
+        res.json({ success: false, message: "Already Booked" });
       } else {
         slots_booked[slotDate].push(slotTime);
       }
@@ -174,9 +174,7 @@ const bookAppointment = async (req, res) => {
       slots_booked[slotDate].push(slotTime);
     }
 
-    const userData = await userModel.find(userId);
-
-    delete docData.slots_booked;
+    const userData = await userModel.findById(userId);
 
     const appointmentData = {
       userId,
@@ -190,6 +188,9 @@ const bookAppointment = async (req, res) => {
     };
     const newAppointment = new appointmentModel(appointmentData);
     await newAppointment.save();
+
+    await doctorModel.findByIdAndUpdate(docId, { slots_booked });
+    res.json({ success: true, message: "Booked succesfully" });
   } catch (err) {
     console.log(err.message);
     res.json({ success: false, message: err.message });

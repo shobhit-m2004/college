@@ -1,16 +1,19 @@
 import { assets } from "../assets/assets";
 import { AppContext } from "../context/context";
 import React, { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import RelatedDoctors from "./../components/RelatedDoctors";
+import { toast } from "react-toastify";
+import axios from "axios";
 const Appointment = () => {
   const { docId } = useParams();
-  const { doctors, currencySymbol } = useContext(AppContext);
+  const { doctors, getDoctorsData, token, backendUrl } = useContext(AppContext);
   const dayOfWeek = ["Sun", "Mun", "tue", "Wed", "Thurs", "Fri", "Sat", "Sun"];
   const [docInfo, setDocInfo] = useState(null);
   const [docSlots, setDocSlots] = useState([]);
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
+  const navigate = useNavigate();
 
   const fetchDocInfo = async () => {
     const info = doctors.find((doc) => doc._id === docId);
@@ -79,6 +82,45 @@ const Appointment = () => {
   useEffect(() => {
     console.log(docSlots);
   }, [docSlots]);
+
+  const bookAppointment = async () => {
+    if (!token) {
+      toast.warn("Login to book appointment");
+      return navigate("./login");
+    }
+
+    try {
+      const date = docSlots[slotIndex][0].datetime;
+      let day = date.getDate();
+      let month = date.getMonth() + 1;
+      let year = date.getFullYear();
+      const slotDate = day + "_" + month + "_" + year;
+      console.log(slotDate);
+
+      const { data } = await axios.post(
+        backendUrl + "/api/user/book-appointment",
+        {
+          docId,
+          slotDate,
+          slotTime,
+        },
+        {
+          headers: { token },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        getDoctorsData();
+        navigate("/my-appointments");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      console.log(err.message);
+      toast.error(err.message);
+    }
+  };
   return (
     docInfo && (
       <div>
@@ -159,7 +201,10 @@ const Appointment = () => {
                   ))}
               </div>
 
-              <button className="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1.5 my-4 rounded-full ">
+              <button
+                className="bg-blue-500 hover:bg-blue-400 text-white px-3 py-1.5 my-4 rounded-full "
+                onClick={bookAppointment}
+              >
                 Book Appointment
               </button>
             </div>
