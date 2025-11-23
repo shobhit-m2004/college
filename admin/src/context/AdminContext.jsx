@@ -6,6 +6,8 @@ export const AdminContext = createContext();
 
 const AdminContextProvider = ({ children }) => {
   const [aToken, setAToken] = useState("");
+  const [appointments, setAppointments] = useState([]);
+  const [dashData, setDashData] = useState(false);
   useEffect(() => {
     setAToken(localStorage.getItem("aToken"));
   }, [aToken]);
@@ -24,7 +26,7 @@ const AdminContextProvider = ({ children }) => {
 
       if (data.success) {
         setDoctors(data.doctors);
-        console.log(data.doctors);
+        // console.log(data.doctors);
       } else {
         toast.error(data.message);
       }
@@ -47,7 +49,6 @@ const AdminContextProvider = ({ children }) => {
 
       if (data.success) {
         toast.success(data.message);
-        getAllDoctors();
       } else {
         toast.error(data.message);
       }
@@ -56,6 +57,68 @@ const AdminContextProvider = ({ children }) => {
       toast.error(err.message);
     }
   };
+
+  const getAllAppointments = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/appointments", {
+        headers: {
+          aToken,
+        },
+      });
+
+      if (data.success) {
+        setAppointments(data.appointments);
+        getAllDoctors();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/cancel-appointment",
+        { appointmentId },
+        {
+          headers: { aToken },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        getAllAppointments();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (err) {
+      console.log(err.message);
+      toast.error(err.message);
+    }
+  };
+
+  const getDashData = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + "/api/admin/dashboard", {
+        headers: {
+          aToken,
+        },
+      });
+
+      if (data?.success) {
+        setDashData(data.dashData);
+        console.log(data.dashData);
+      } else {
+        toast.error(data?.message);
+      }
+    } catch (err) {
+      console.log(err.message);
+      toast.error(err.message);
+    }
+  };
+
   const value = {
     aToken,
     setAToken,
@@ -63,6 +126,11 @@ const AdminContextProvider = ({ children }) => {
     doctors,
     getAllDoctors,
     changeAvailability,
+    getAllAppointments,
+    appointments,
+    cancelAppointment,
+    dashData,
+    getDashData,
   };
   return (
     <AdminContext.Provider value={value}>{children} </AdminContext.Provider>

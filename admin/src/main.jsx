@@ -8,14 +8,14 @@ import AppContextProvider from "./context/Appcontext.jsx";
 import DoctorContextProvider from "./context/DoctorContext.jsx";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
+    <AppContextProvider>
       <AdminContextProvider>
-        <DoctorContextProvider>
-          <AppContextProvider>
+        <BrowserRouter>
+          <DoctorContextProvider>
             <App />
-          </AppContextProvider>
-        </DoctorContextProvider>
+          </DoctorContextProvider>
+        </BrowserRouter>
       </AdminContextProvider>
-    </BrowserRouter>
+    </AppContextProvider>
   </StrictMode>
 );

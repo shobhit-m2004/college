@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from "cloudinary";
 import doctorModel from "./../models/doctorModel.js";
 import appointmentModel from "./../models/appointmentModel.js";
+import razorpay from "razorpay";
 
 const registerUser = async (req, res) => {
   try {
@@ -197,4 +198,108 @@ const bookAppointment = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, getProfile, updateProfile, bookAppointment };
+const listAppointment = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const appointments = await appointmentModel.find({ userId });
+    res.json({ success: true, appointments });
+  } catch (err) {
+    console.log(err.message);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+const cancelAppointment = async (req, res) => {
+  try {
+    const { userId, appointmentId } = req.body;
+    const appointmentData = await appointmentModel.findById(appointmentId);
+
+    if (appointmentData.userId != userId) {
+      return res.json({ success: false, message: "unauthorizes action" });
+    }
+
+    await appointmentModel.findByIdAndUpdate(appointmentId, {
+      cancelled: true,
+    });
+
+    const { docId, slotDate, slotTime } = appointmentData;
+
+    const doctorData = await doctorModel.findById(docId);
+
+    let slots_booked = doctorData.slots_booked;
+
+    slots_booked[slotDate] = slots_booked[slotDate].filter(
+      (e) => e !== slotTime
+    );
+
+    await doctorModel.findByIdAndUpdate(docId, { slots_booked });
+
+    res.json({ success: true, message: "Appointment Cancelled Succesfully" });
+  } catch (err) {
+    console.log(err.message);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+const razorpayInstance = new razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
+
+const paymentRazorPay = async (req, res) => {
+  try {
+    const { appointmentId } = req.body;
+    const appointmentData = await appointmentModel.findById(appointmentId);
+
+    if (!appointmentData || appointmentData.cancelled) {
+      res.json({ succes: false, message: "Appointment not found" });
+    }
+
+    const options = {
+      amount: appointmentData.amount,
+      currency: process.env.CURRENCY,
+      receipt: appointmentId,
+    };
+
+    //creetion of an order;
+    const order = await razorpayInstance.orders.create(options);
+
+    res.json({ success: true.order });
+  } catch (err) {
+    console.log(err.message);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+const verifyRazorpay = async (req, res) => {
+  try {
+    const { razorpay_order_id } = req.body;
+    const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
+    console.log(orderInfo);
+
+    if (orderInfo.status === "paid") {
+      await appointmentModel.findByIdAndUpdate(orderInfo.receipt, {
+        payment: true,
+      });
+
+      res.json({ succes: true, message: "payment Successfull" });
+    } else {
+      res.json({ succes: true, message: "payment failed" });
+    }
+  } catch (err) {
+    console.log(err.message);
+    res.json({ success: false, message: err.message });
+  }
+};
+
+export {
+  registerUser,
+  loginUser,
+  getProfile,
+  updateProfile,
+  bookAppointment,
+  listAppointment,
+  cancelAppointment,
+  paymentRazorPay,
+  verifyRazorpay,
+};
