@@ -1,0 +1,82 @@
+{
+  "LogisticRegression": {
+    "roc_auc_mean": 0.8356561461794019,
+    "roc_auc_std": 0.02440013030889299,
+    "precision_mean": 0.6399201203138343,
+    "recall_mean": 0.7102990033222591,
+    "f1_mean": 0.6712496607215132,
+    "accuracy_mean": 0.7572837531654004
+  },
+  "RandomForest": {
+    "roc_auc_mean": 0.8143833056478404,
+    "roc_auc_std": 0.03661519298555071,
+    "precision_mean": 0.6841380876674994,
+    "recall_mean": 0.5699889258028792,
+    "f1_mean": 0.6199009697042113,
+    "accuracy_mean": 0.7556577369052379
+  },
+  "ExtraTrees": {
+    "roc_auc_mean": 0.8214707918050941,
+    "roc_auc_std": 0.034554035560765306,
+    "precision_mean": 0.7125033171163203,
+    "recall_mean": 0.5748615725359911,
+    "f1_mean": 0.6356839826839826,
+    "accuracy_mean": 0.7703318672530988
+  },
+  "HistGB": {
+    "roc_auc_mean": 0.7759413067552602,
+    "roc_auc_std": 0.03404255072588971,
+    "precision_mean": 0.6141579128666648,
+    "recall_mean": 0.5374307862679956,
+    "f1_mean": 0.5718923373670733,
+    "accuracy_mean": 0.7198320671731308
+  },
+  "GradientBoosting": {
+    "roc_auc_mean": 0.7949557032115171,
+    "roc_auc_std": 0.024905467703093216,
+    "precision_mean": 0.6583119264664651,
+    "recall_mean": 0.6027685492801772,
+    "f1_mean": 0.6261004012549494,
+    "accuracy_mean": 0.7491136878581901
+  },
+  "SVC": {
+    "roc_auc_mean": 0.8410603543743079,
+    "roc_auc_std": 0.022721643334999368,
+    "precision_mean": 0.6245725274027161,
+    "recall_mean": 0.7194905869324474,
+    "f1_mean": 0.6673060653119403,
+    "accuracy_mean": 0.7491003598560575
+  },
+  "KNN": {
+    "roc_auc_mean": 0.8075879014396457,
+    "roc_auc_std": 0.03670260254383274,
+    "precision_mean": 0.7080568983079125,
+    "recall_mean": 0.5613510520487266,
+    "f1_mean": 0.6234452798663325,
+    "accuracy_mean": 0.7655071304811407
+  },
+  "GaussianNB": {
+    "roc_auc_mean": 0.8285658914728682,
+    "roc_auc_std": 0.02140770343217625,
+    "precision_mean": 0.6682068448347518,
+    "recall_mean": 0.6304540420819491,
+    "f1_mean": 0.6481135339204107,
+    "accuracy_mean": 0.7621751299480208
+  },
+  "DecisionTree": {
+    "roc_auc_mean": 0.6467677187153932,
+    "roc_auc_std": 0.014874884157672756,
+    "precision_mean": 0.5356656668387595,
+    "recall_mean": 0.5560354374307863,
+    "f1_mean": 0.543685132888702,
+    "accuracy_mean": 0.6742369718779154
+  },
+  "XGBoost": {
+    "roc_auc_mean": 0.79359496124031,
+    "roc_auc_std": 0.033203737844383324,
+    "precision_mean": 0.6209230033476806,
+    "recall_mean": 0.6169435215946844,
+    "f1_mean": 0.6163231065601009,
+    "accuracy_mean": 0.732906837265094
+  }
+}

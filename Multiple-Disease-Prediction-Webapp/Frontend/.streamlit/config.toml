@@ -1,0 +1,14 @@
+# Streamlit configuration for Blue and White theme
+
+[theme]
+primaryColor = "#0066CC"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F4FF"
+textColor = "#003366"
+font = "sans serif"
+
+[client]
+toolbarMode = "viewer"
+
+[logger]
+level = "info"
