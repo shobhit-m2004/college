@@ -117,8 +117,8 @@ const Sidebar = () => {
               }`
             }
           >
-            <img src={assets.add_icon} alt="" className="w-6 h-6" />
-            <p>Add Doctor</p>
+            <img src={assets.people_icon} alt="" className="w-6 h-6" />
+            <p>My Profile</p>
           </NavLink>
         </ul>
       )}
