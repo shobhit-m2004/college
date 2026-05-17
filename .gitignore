@@ -3,6 +3,7 @@
 
 # Environment files
 **/.env
+**/venv
 
 # Build / dist folders
 **/build/
