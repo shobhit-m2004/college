@@ -1,45 +1,80 @@
 import { assets } from "../assets/assets";
 import React from "react";
+import { NavLink } from "react-router-dom";
+import { CalendarHeart, MapPin, Phone } from "lucide-react";
+import { diseasePredictionUrl } from "../lib/diseasePrediction";
+import { adminPanelUrl } from "../lib/adminPanel";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 p-8">
-      {/* Top section */}
-      <div className="flex flex-wrap justify-between gap-8">
-        {/* Left */}
-        <div className="flex-1 min-w-[200px]">
-          <img src={assets.mylogo} alt="Logo" className="w-32 mb-4" />
-          <p className="text-gray-700 text-sm">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti
-            libero nulla, quos veniam necessitatibus expedita, illo enim iure
-            labore unde suscipit.
-          </p>
-        </div>
+    <footer className="mt-10">
+      <div className="section-shell px-6 py-10 sm:px-8">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr_0.8fr]">
+          <div className="space-y-4">
+            <img src={assets.mylogo} alt="Logo" className="w-36" />
+            <p className="max-w-md text-sm leading-7 text-slate-600">
+              A modern healthcare booking experience built to help patients find
+              the right doctor, lock in a slot faster, and stay confident through
+              every step of care.
+            </p>
+            <a
+              href={diseasePredictionUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="secondary-cta"
+            >
+              <CalendarHeart className="h-4 w-4" />
+              Open Disease Prediction
+            </a>
+            <a
+              href={adminPanelUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="secondary-cta"
+            >
+              Open Admin Panel
+            </a>
+          </div>
 
-        {/* Center */}
-        <div className="flex-1 min-w-[150px]">
-          <p className="font-semibold mb-2">COMPANY</p>
-          <ul className="space-y-1 text-gray-700 text-sm">
-            <li>Home</li>
-            <li>About us</li>
-            <li>Contact us</li>
-            <li>Privacy Policy</li>
-          </ul>
-        </div>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
+              Navigate
+            </p>
+            <div className="mt-4 space-y-3 text-sm font-medium text-slate-600">
+              <NavLink className="block hover:text-sky-700" to="/">
+                Home
+              </NavLink>
+              <NavLink className="block hover:text-sky-700" to="/doctors">
+                All Doctors
+              </NavLink>
+              <NavLink className="block hover:text-sky-700" to="/about">
+                About Us
+              </NavLink>
+              <NavLink className="block hover:text-sky-700" to="/contact">
+                Contact
+              </NavLink>
+            </div>
+          </div>
 
-        {/* Right */}
-        <div className="flex-1 min-w-[150px]">
-          <p className="font-semibold mb-2">GET IN TOUCH</p>
-          <ul className="space-y-1 text-gray-700 text-sm">
-            <li>9935076320</li>
-            <li>Email</li>
-          </ul>
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
+              Reach us
+            </p>
+            <div className="mt-4 space-y-4 text-sm text-slate-600">
+              <div className="flex items-start gap-3">
+                <Phone className="mt-0.5 h-4 w-4 text-sky-700" />
+                <span>+91 99350 76320</span>
+              </div>
+              <div className="flex items-start gap-3">
+                <MapPin className="mt-0.5 h-4 w-4 text-sky-700" />
+                <span>Patient-first digital care, available wherever you are.</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Bottom section */}
-      <div className="mt-6 border-t pt-4 text-center text-gray-500 text-sm">
-        all copyright reserved Shobhit Mishra
+        <div className="mt-8 border-t border-slate-200 pt-5 text-sm text-slate-500">
+          Copyright reserved by Shobhit Mishra.
+        </div>
       </div>
     </footer>
   );

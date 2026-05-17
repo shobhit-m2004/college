@@ -4,125 +4,83 @@ import { assets } from "./../assets/assets";
 import { NavLink } from "react-router-dom";
 import { DoctorContext } from "../context/DoctorContext";
 
+const SidebarLink = ({ to, icon, label }) => (
+  <NavLink
+    to={to}
+    className={({ isActive }) =>
+      `flex items-center gap-4 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+        isActive
+          ? "bg-sky-600 text-white shadow-[0_14px_30px_rgba(14,96,172,0.22)]"
+          : "text-slate-700 hover:bg-slate-50 hover:text-sky-700"
+      }`
+    }
+  >
+    <img src={icon} alt="" className="h-5 w-5" />
+    <span>{label}</span>
+  </NavLink>
+);
+
 const Sidebar = () => {
   const { aToken } = useContext(AdminContext);
   const { dToken } = useContext(DoctorContext);
 
   return (
-    <div className="w-64 h-screen bg-white   flex flex-col pt-6">
+    <aside className="admin-panel h-fit w-full p-4 lg:sticky lg:top-6 lg:w-72">
+      <div className="rounded-[24px] border border-slate-200 bg-slate-50/80 p-4">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-700">
+          Navigation
+        </p>
+        <p className="mt-2 text-sm leading-7 text-slate-600">
+          Switch between dashboards, appointments, profiles, and doctor management
+          from one unified control panel.
+        </p>
+      </div>
+
       {aToken && (
-        <ul className="flex flex-col gap-2">
-          <NavLink
+        <ul className="mt-4 space-y-2">
+          <SidebarLink
             to="/admin-dashboard"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-3 rounded-lg font-medium transition-all duration-200 
-              ${
-                isActive
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-800 hover:bg-gray-100"
-              }`
-            }
-          >
-            <img src={assets.home_icon} alt="" className="w-6 h-6" />
-            <p>Dashboard</p>
-          </NavLink>
-
-          <NavLink
+            icon={assets.home_icon}
+            label="Dashboard"
+          />
+          <SidebarLink
             to="/all-appointments"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-3 rounded-lg font-medium transition-all duration-200 
-              ${
-                isActive
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-800 hover:bg-gray-100"
-              }`
-            }
-          >
-            <img src={assets.appointment_icon} alt="" className="w-6 h-6" />
-            <p>Appointments</p>
-          </NavLink>
-
-          <NavLink
+            icon={assets.appointment_icon}
+            label="Appointments"
+          />
+          <SidebarLink
             to="/add-doctor"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-3 rounded-lg font-medium transition-all duration-200 
-              ${
-                isActive
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-800 hover:bg-gray-100"
-              }`
-            }
-          >
-            <img src={assets.add_icon} alt="" className="w-6 h-6" />
-            <p>Add Doctor</p>
-          </NavLink>
-
-          <NavLink
+            icon={assets.add_icon}
+            label="Add Doctor"
+          />
+          <SidebarLink
             to="/doctor-list"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-3 rounded-lg font-medium transition-all duration-200 
-              ${
-                isActive
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-800 hover:bg-gray-100"
-              }`
-            }
-          >
-            <img src={assets.people_icon} alt="" className="w-6 h-6" />
-            <p>Doctor List</p>
-          </NavLink>
+            icon={assets.people_icon}
+            label="Doctor List"
+          />
         </ul>
       )}
-      {/* For doctors */}
+
       {dToken && (
-        <ul className="flex flex-col gap-2">
-          <NavLink
+        <ul className="mt-4 space-y-2">
+          <SidebarLink
             to="/doctor-dashboard"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-3 rounded-lg font-medium transition-all duration-200 
-              ${
-                isActive
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-800 hover:bg-gray-100"
-              }`
-            }
-          >
-            <img src={assets.home_icon} alt="" className="w-6 h-6" />
-            <p>Dashboard</p>
-          </NavLink>
-
-          <NavLink
+            icon={assets.home_icon}
+            label="Dashboard"
+          />
+          <SidebarLink
             to="/doctor-appointments"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-3 rounded-lg font-medium transition-all duration-200 
-              ${
-                isActive
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-800 hover:bg-gray-100"
-              }`
-            }
-          >
-            <img src={assets.appointment_icon} alt="" className="w-6 h-6" />
-            <p>Appointments</p>
-          </NavLink>
-
-          <NavLink
+            icon={assets.appointment_icon}
+            label="Appointments"
+          />
+          <SidebarLink
             to="/doctor-profile"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-3 rounded-lg font-medium transition-all duration-200 
-              ${
-                isActive
-                  ? "bg-blue-600 text-white"
-                  : "text-gray-800 hover:bg-gray-100"
-              }`
-            }
-          >
-            <img src={assets.people_icon} alt="" className="w-6 h-6" />
-            <p>My Profile</p>
-          </NavLink>
+            icon={assets.people_icon}
+            label="My Profile"
+          />
         </ul>
       )}
-    </div>
+    </aside>
   );
 };
 

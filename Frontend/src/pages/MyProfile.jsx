@@ -2,9 +2,10 @@ import React, { useContext, useState } from "react";
 import { AppContext } from "../context/context";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Mail, MapPin, Phone, UserRound } from "lucide-react";
 
 const MyProfile = () => {
-  const { userData, setUserData, token, loadProfileData, backendUrl } =
+  const { userData, setUserData, token, loadUserProfileData, backendUrl } =
     useContext(AppContext);
   const [isEdit, setIsEdit] = useState(false);
   const [image, setImage] = useState(null);
@@ -29,21 +30,19 @@ const MyProfile = () => {
 
       if (data.success) {
         toast.success("Profile updated successfully");
-        await loadProfileData();
+        await loadUserProfileData();
         setIsEdit(false);
       } else {
         toast.error(data.message);
       }
     } catch (err) {
-      console.log(err.message);
       toast.error(err.message);
     }
   };
 
   return (
     userData && (
-      <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-6 space-y-6">
-        {/* Profile Image */}
+      <section className="section-shell mx-auto max-w-3xl p-6 sm:p-8">
         <div className="flex flex-col items-center">
           {isEdit ? (
             <div>
@@ -53,7 +52,7 @@ const MyProfile = () => {
                     <img
                       src={URL.createObjectURL(image)}
                       alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                      className="h-24 w-24 rounded-full border-2 border-gray-300 object-cover"
                     />
                   ) : (
                     <img
@@ -62,7 +61,7 @@ const MyProfile = () => {
                         "https://img.freepik.com/premium-vector/gray-picture-person-with-gray-background_1197690-22.jpg?semt=ais_hybrid&w=740&q=80"
                       }
                       alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                      className="h-24 w-24 rounded-full border-2 border-gray-300 object-cover"
                     />
                   )}
                 </div>
@@ -82,12 +81,12 @@ const MyProfile = () => {
                 "https://img.freepik.com/premium-vector/gray-picture-person-with-gray-background_1197690-22.jpg?semt=ais_hybrid&w=740&q=80"
               }
               alt="Profile"
-              className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+              className="h-24 w-24 rounded-full border-2 border-gray-300 object-cover"
             />
           )}
 
           {isEdit ? (
-            <div className="flex gap-2 mt-4">
+            <div className="mt-4 flex gap-2">
               <input
                 value={userData.firstName}
                 onChange={(e) =>
@@ -97,7 +96,7 @@ const MyProfile = () => {
                   }))
                 }
                 type="text"
-                className="border rounded-md px-2 py-1"
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-3"
               />
               <input
                 value={userData.lastName}
@@ -108,154 +107,151 @@ const MyProfile = () => {
                   }))
                 }
                 type="text"
-                className="border rounded-md px-2 py-1"
+                className="rounded-2xl border border-slate-200 bg-white px-4 py-3"
               />
             </div>
           ) : (
-            <p className="mt-4 text-xl font-semibold">
+            <p className="mt-4 text-2xl font-semibold text-slate-900">
               {userData.firstName + " " + userData.lastName}
             </p>
           )}
         </div>
 
-        <hr className="border-gray-300" />
-
-        {/* Contact Info */}
-        <div className="space-y-2">
-          <p className="text-lg font-semibold text-gray-700">
-            Contact Information
-          </p>
-          <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-            <div>
-              <p className="text-gray-600 font-medium">Email ID:</p>
-              <p className="text-gray-800">{userData.email}</p>
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="rounded-[28px] border border-slate-200 bg-slate-50/80 p-5">
+            <div className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <Mail className="h-4 w-4 text-sky-700" />
+              Contact information
             </div>
-
-            <div>
-              <p className="text-gray-600 font-medium">Phone:</p>
-              {isEdit ? (
-                <input
-                  value={userData.phone}
-                  onChange={(e) =>
-                    setUserData((prev) => ({ ...prev, phone: e.target.value }))
-                  }
-                  type="text"
-                  className="border rounded-md px-2 py-1 w-full"
-                />
-              ) : (
-                <p className="text-gray-800">{userData.phone}</p>
-              )}
-            </div>
-
-            <div>
-              <p className="text-gray-600 font-medium">Address:</p>
-              {isEdit ? (
-                <div className="space-y-2">
-                  <p>Line 1:</p>
+            <div className="space-y-4 text-sm text-slate-600">
+              <div>
+                <p className="font-semibold text-slate-900">Email</p>
+                <p>{userData.email}</p>
+              </div>
+              <div>
+                <p className="flex items-center gap-2 font-semibold text-slate-900">
+                  <Phone className="h-4 w-4 text-sky-700" />
+                  Phone
+                </p>
+                {isEdit ? (
                   <input
-                    value={userData.address.line1 || ""}
+                    value={userData.phone}
                     onChange={(e) =>
-                      setUserData((prev) => ({
-                        ...prev,
-                        address: { ...prev.address, line1: e.target.value },
-                      }))
+                      setUserData((prev) => ({ ...prev, phone: e.target.value }))
                     }
                     type="text"
-                    className="border rounded-md px-2 py-1 w-full"
+                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3"
                   />
-                  <p>Line 2:</p>
-                  <input
-                    value={userData.address.line2 || ""}
+                ) : (
+                  <p>{userData.phone}</p>
+                )}
+              </div>
+              <div>
+                <p className="flex items-center gap-2 font-semibold text-slate-900">
+                  <MapPin className="h-4 w-4 text-sky-700" />
+                  Address
+                </p>
+                {isEdit ? (
+                  <div className="mt-2 space-y-2">
+                    <input
+                      value={userData.address.line1 || ""}
+                      onChange={(e) =>
+                        setUserData((prev) => ({
+                          ...prev,
+                          address: { ...prev.address, line1: e.target.value },
+                        }))
+                      }
+                      type="text"
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3"
+                    />
+                    <input
+                      value={userData.address.line2 || ""}
+                      onChange={(e) =>
+                        setUserData((prev) => ({
+                          ...prev,
+                          address: { ...prev.address, line2: e.target.value },
+                        }))
+                      }
+                      type="text"
+                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <p>{userData.address.line1}</p>
+                    <p>{userData.address.line2}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[28px] border border-slate-200 bg-slate-50/80 p-5">
+            <div className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <UserRound className="h-4 w-4 text-sky-700" />
+              Basic information
+            </div>
+            <div className="space-y-4 text-sm text-slate-600">
+              <div>
+                <p className="font-semibold text-slate-900">Gender</p>
+                {isEdit ? (
+                  <select
+                    value={userData.gender}
                     onChange={(e) =>
-                      setUserData((prev) => ({
-                        ...prev,
-                        address: { ...prev.address, line2: e.target.value },
-                      }))
+                      setUserData((prev) => ({ ...prev, gender: e.target.value }))
                     }
-                    type="text"
-                    className="border rounded-md px-2 py-1 w-full"
+                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3"
+                  >
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Not To Say">Not to say</option>
+                  </select>
+                ) : (
+                  <p>{userData.gender}</p>
+                )}
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">Birth Date</p>
+                {isEdit ? (
+                  <input
+                    value={userData.dob}
+                    onChange={(e) =>
+                      setUserData((prev) => ({ ...prev, dob: e.target.value }))
+                    }
+                    type="date"
+                    className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3"
                   />
-                </div>
-              ) : (
-                <div className="text-gray-800">
-                  <p>{userData.address.line1}</p>
-                  <p>{userData.address.line2}</p>
-                </div>
-              )}
+                ) : (
+                  <p>{userData.dob}</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Basic Info */}
-        <div className="space-y-2">
-          <p className="text-lg font-semibold text-gray-700">
-            Basic Information
-          </p>
-          <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-            <div>
-              <p className="text-gray-600 font-medium">Gender:</p>
-              {isEdit ? (
-                <select
-                  value={userData.gender}
-                  onChange={(e) =>
-                    setUserData((prev) => ({ ...prev, gender: e.target.value }))
-                  }
-                  className="border rounded-md px-2 py-1 w-full"
-                >
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Not To Say">Not to say</option>
-                </select>
-              ) : (
-                <p className="text-gray-800">{userData.gender}</p>
-              )}
-            </div>
-
-            <div>
-              <p className="text-gray-600 font-medium">Birth Date:</p>
-              {isEdit ? (
-                <input
-                  value={userData.dob}
-                  onChange={(e) =>
-                    setUserData((prev) => ({ ...prev, dob: e.target.value }))
-                  }
-                  type="date"
-                  className="border rounded-md px-2 py-1 w-full"
-                />
-              ) : (
-                <p className="text-gray-800">{userData.dob}</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Buttons */}
-        <div className="flex justify-end gap-3">
+        <div className="mt-6 flex justify-end gap-3">
           {!isEdit ? (
-            <button
-              onClick={() => setIsEdit(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
-            >
+            <button onClick={() => setIsEdit(true)} className="primary-cta">
               Edit
             </button>
           ) : (
             <>
-              <button
-                onClick={() => setIsEdit(false)}
-                className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition"
-              >
+              <button onClick={() => setIsEdit(false)} className="secondary-cta">
                 Cancel
               </button>
               <button
-                onClick={() => (updateUserProfileData(), setIsEdit(false))}
-                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
+                onClick={() => {
+                  updateUserProfileData();
+                }}
+                className="primary-cta bg-emerald-600 hover:bg-emerald-500"
               >
                 Save Info
               </button>
             </>
           )}
         </div>
-      </div>
+      </section>
     )
   );
 };

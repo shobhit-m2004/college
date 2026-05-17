@@ -3,41 +3,32 @@ import { assets } from "./../assets/assets";
 
 const About = () => {
   return (
-    <div className="flex flex-col md:flex-row items-center gap-10 px-8 md:px-20 py-16 bg-gray-50">
-      {/* Left Text Section */}
-      <div className="md:w-1/2 space-y-6">
-        <h2 className="text-blue-600 font-semibold text-lg">ABOUT US</h2>
-        <h1 className="text-4xl font-bold text-gray-800">
-          Your Health, Our Priority
+    <section className="section-shell grid items-center gap-10 px-6 py-10 sm:px-8 lg:grid-cols-2">
+      <div className="space-y-5">
+        <span className="section-kicker">About the platform</span>
+        <h1 className="section-title">
+          Your health, guided by a cleaner digital experience
         </h1>
-        <p className="text-gray-600 leading-relaxed">
-          Welcome to{" "}
-          <span className="font-semibold text-blue-600">Doctor+</span> — your
-          trusted digital healthcare platform where you can easily find and
-          consult with the right doctors anytime, anywhere. We bring together
-          verified medical professionals across multiple specialties to ensure
-          that you get the best care from the comfort of your home.
+        <p className="section-copy">
+          Doctor+ helps patients move from searching to scheduling without the
+          noise. We bring verified doctors, structured profiles, and a calmer
+          appointment flow into one modern experience.
         </p>
-        <p className="text-gray-600 leading-relaxed">
-          Whether you need a quick consultation, a prescription, or continuous
-          care, Prescripto helps you connect with top doctors instantly. We aim
-          to make healthcare more accessible, secure, and efficient for
-          everyone.
+        <p className="section-copy">
+          Whether you need a quick consultation or ongoing specialist care, the
+          platform is designed to make access feel simpler, more personal, and
+          more reliable.
         </p>
-        {/* <button className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
-          Learn More
-        </button> */}
       </div>
 
-      {/* Right Image Section */}
-      <div className="md:w-1/2 flex justify-center">
+      <div className="flex justify-center">
         <img
           src={assets.about_image}
           alt="About Prescripto"
-          className="rounded-2xl shadow-lg w-full max-w-md"
+          className="w-full max-w-xl rounded-[32px] shadow-[0_28px_80px_rgba(15,23,42,0.16)]"
         />
       </div>
-    </div>
+    </section>
   );
 };
 

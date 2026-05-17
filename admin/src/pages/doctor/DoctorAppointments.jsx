@@ -10,7 +10,7 @@ const DoctorAppointments = () => {
   const getAppointments = async () => {
     try {
       const { data } = await axios.get(
-        backendUrl + "/api/doctor/my-appointments",
+        `${backendUrl}/api/doctor/my-appointments`,
         {
           headers: {
             dtoken: dToken,
@@ -28,13 +28,10 @@ const DoctorAppointments = () => {
     }
   };
 
-  // --------------------------
-  //  CANCEL APPOINTMENT (POST)
-  // --------------------------
   const cancelAppointment = async (appointmentId) => {
     try {
       const { data } = await axios.post(
-        backendUrl + "/api/doctor/cancel-appointment",
+        `${backendUrl}/api/doctor/cancel-appointment`,
         { appointmentId },
         {
           headers: {
@@ -54,13 +51,10 @@ const DoctorAppointments = () => {
     }
   };
 
-  // ------------------------------
-  //  MARK APPOINTMENT COMPLETED
-  // ------------------------------
-  const AppointmentCompleted = async (appointmentId) => {
+  const appointmentCompleted = async (appointmentId) => {
     try {
       const { data } = await axios.post(
-        backendUrl + "/api/doctor/appointment-completed",
+        `${backendUrl}/api/doctor/appointment-completed`,
         { appointmentId },
         {
           headers: {
@@ -84,74 +78,75 @@ const DoctorAppointments = () => {
     getAppointments();
   }, [dToken]);
 
-  return (
-    <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-4">My Appointments</h2>
+  const activeAppointments = appointments.filter((item) => !item?.isCompleted);
 
-      {!appointments?.length && (
-        <p className="text-gray-400">No appointments available.</p>
+  return (
+    <section className="space-y-6">
+      <div className="admin-panel px-6 py-8 sm:px-8">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <span className="admin-kicker">Doctor appointment desk</span>
+            <h1 className="mt-3 text-3xl font-semibold text-slate-950">
+              My appointments
+            </h1>
+          </div>
+          <div className="admin-chip">{activeAppointments.length} active bookings</div>
+        </div>
+      </div>
+
+      {!activeAppointments.length && (
+        <div className="admin-panel px-6 py-8 text-slate-400">No appointments available.</div>
       )}
 
       <div className="grid gap-4">
-        {appointments.map(
-          (item, index) =>
-            !item?.isCompleted && (
-              <div
-                key={index}
-                className="flex gap-4 bg-white p-4 rounded-xl shadow border hover:shadow-lg transition"
-              >
-                {/* IMAGE */}
-                <div>
-                  <img
-                    src={
-                      item?.userData?.image ||
-                      "https://img.freepik.com/free-psd/3d-rendered-user-icon-blue-circle_84443-55891.jpg"
-                    }
-                    className="w-20 h-20 rounded-full object-cover border"
-                    alt="user"
-                  />
-                </div>
+        {activeAppointments.map((item, index) => (
+          <div key={index} className="admin-table-row flex flex-col gap-4 md:flex-row">
+            <div>
+              <img
+                src={
+                  item?.userData?.image ||
+                  "https://img.freepik.com/free-psd/3d-rendered-user-icon-blue-circle_84443-55891.jpg"
+                }
+                className="h-20 w-20 rounded-[24px] border border-slate-200 object-cover"
+                alt="user"
+              />
+            </div>
 
-                {/* DETAILS */}
-                <div className="flex flex-col justify-between">
-                  <div>
-                    <p className="font-semibold text-lg">
-                      {item?.userData?.firstName} {item?.userData?.lastName}
-                    </p>
-                    <p className="text-gray-600">Slot Date: {item?.slotDate}</p>
-                    <p className="text-gray-600">Slot Time: {item?.slotTime}</p>
-                  </div>
-
-                  {/* BUTTONS */}
-                  {!item.cancelled ? (
-                    <div className="flex gap-3 mt-3">
-                      <button
-                        onClick={() => cancelAppointment(item._id)}
-                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                      >
-                        Cancel
-                      </button>
-
-                      <button
-                        onClick={() => AppointmentCompleted(item._id)}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                      >
-                        Completed
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="mt-3">
-                      <span className="px-4 py-2 bg-gray-400 text-white rounded-lg">
-                        Cancelled
-                      </span>
-                    </div>
-                  )}
-                </div>
+            <div className="flex flex-1 flex-col justify-between gap-4 md:flex-row md:items-center">
+              <div>
+                <p className="text-lg font-semibold text-slate-900">
+                  {item?.userData?.firstName} {item?.userData?.lastName}
+                </p>
+                <p className="mt-1 text-slate-600">Slot Date: {item?.slotDate}</p>
+                <p className="text-slate-600">Slot Time: {item?.slotTime}</p>
               </div>
-            )
-        )}
+
+              {!item.cancelled ? (
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => cancelAppointment(item._id)}
+                    className="admin-danger-btn"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={() => appointmentCompleted(item._id)}
+                    className="admin-primary-btn bg-emerald-600 hover:bg-emerald-500"
+                  >
+                    Completed
+                  </button>
+                </div>
+              ) : (
+                <span className="admin-chip bg-slate-100 text-slate-500">
+                  Cancelled
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
+    </section>
   );
 };
 

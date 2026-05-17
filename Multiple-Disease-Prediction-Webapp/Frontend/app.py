@@ -1,3 +1,8 @@
+import base64
+import os
+import sys
+from pathlib import Path
+
 import streamlit as st
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -10,6 +15,12 @@ from PIL import Image
 import numpy as np
 import plotly.figure_factory as ff
 import streamlit as st
+
+BASE_DIR = Path(__file__).resolve().parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+os.chdir(BASE_DIR)
+
 from code.DiseaseModel import DiseaseModel
 from code.helper import prepare_symptoms_array
 from code.llm_agent import (
@@ -30,29 +41,34 @@ st.set_page_config(
     layout="wide",
 )
 
-# Custom CSS styling for Blue and White theme
+# Custom CSS styling for modern healthcare UI
 st.markdown("""
     <style>
     :root {
-        --primary-blue: #0b63ce;
-        --primary-blue-dark: #084b9a;
-        --primary-blue-soft: #eaf3ff;
-        --primary-blue-border: #b9d4f5;
-        --surface-white: #ffffff;
-        --surface-alt: #f6faff;
-        --text-main: #12365f;
-        --text-soft: #42698f;
-        --success-bg: #edf7ff;
+        --primary-blue: #0d5ea8;
+        --primary-blue-dark: #094b86;
+        --primary-blue-soft: #e7f2ff;
+        --primary-blue-border: #cfe1f5;
+        --accent-mint: #d9f1ea;
+        --surface-white: rgba(255, 255, 255, 0.84);
+        --surface-strong: #ffffff;
+        --surface-alt: #f4f9ff;
+        --text-main: #17324d;
+        --text-soft: #5d7896;
+        --success-bg: #edf9f4;
         --warning-bg: #fff8e8;
-        --radius-md: 12px;
-        --radius-lg: 18px;
-        --shadow-soft: 0 10px 30px rgba(11, 99, 206, 0.08);
+        --radius-md: 14px;
+        --radius-lg: 24px;
+        --radius-xl: 32px;
+        --shadow-soft: 0 24px 80px rgba(23, 50, 77, 0.09);
+        --shadow-card: 0 18px 45px rgba(23, 50, 77, 0.08);
     }
 
     .stApp {
         background:
-            radial-gradient(circle at top left, rgba(11, 99, 206, 0.10), transparent 28%),
-            linear-gradient(180deg, #f7fbff 0%, #eef5ff 100%);
+            radial-gradient(circle at top left, rgba(13, 94, 168, 0.14), transparent 28%),
+            radial-gradient(circle at top right, rgba(35, 173, 150, 0.12), transparent 24%),
+            linear-gradient(180deg, #fffdf8 0%, #f5fbff 100%);
         color: var(--text-main);
     }
 
@@ -61,14 +77,15 @@ st.markdown("""
     }
 
     .block-container {
-        padding-top: 1.4rem;
-        padding-bottom: 2rem;
+        padding-top: 1.2rem;
+        padding-bottom: 2.4rem;
+        max-width: 1220px;
     }
 
     h1, h2, h3 {
-        color: var(--primary-blue);
-        font-weight: 700;
-        letter-spacing: -0.02em;
+        color: var(--text-main);
+        font-weight: 800;
+        letter-spacing: -0.03em;
     }
 
     p, span, label, div {
@@ -76,7 +93,7 @@ st.markdown("""
     }
 
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #f4f9ff 0%, #e7f1ff 100%);
+        background: linear-gradient(180deg, #edf6ff 0%, #f7fbff 100%);
         border-right: 1px solid var(--primary-blue-border);
     }
 
@@ -84,20 +101,183 @@ st.markdown("""
         color: var(--text-main);
     }
 
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+    .sidebar-brand {
+        padding: 1rem 1rem 0.4rem 1rem;
+        margin-bottom: 0.6rem;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid var(--primary-blue-border);
+        box-shadow: var(--shadow-card);
+    }
+
+    .sidebar-brand-kicker {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--primary-blue);
+        margin-bottom: 0.4rem;
+    }
+
+    .sidebar-brand-title {
+        font-size: 1.2rem;
+        font-weight: 800;
         color: var(--text-main);
+        margin-bottom: 0.25rem;
+    }
+
+    .sidebar-brand-copy {
+        font-size: 0.92rem;
+        line-height: 1.6;
+        color: var(--text-soft);
+        margin-bottom: 0.9rem;
+    }
+
+    .hero-card {
+        padding: 2rem 2rem 1.7rem 2rem;
+        border-radius: var(--radius-xl);
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        background:
+            linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(247, 251, 255, 0.95) 100%);
+        box-shadow: var(--shadow-soft);
+        backdrop-filter: blur(10px);
+    }
+
+    .hero-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin-bottom: 1rem;
+        padding: 0.5rem 0.85rem;
+        border-radius: 999px;
+        border: 1px solid var(--primary-blue-border);
+        background: var(--primary-blue-soft);
+        color: var(--primary-blue);
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+    }
+
+    .hero-title {
+        font-size: clamp(2rem, 4vw, 3.45rem);
+        line-height: 1.02;
+        font-weight: 800;
+        color: #10253d;
+        margin-bottom: 0.9rem;
+    }
+
+    .hero-copy {
+        font-size: 1.02rem;
+        line-height: 1.8;
+        color: var(--text-soft);
+        max-width: 780px;
+        margin-bottom: 1rem;
+    }
+
+    .hero-chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+        margin-top: 1rem;
+    }
+
+    .hero-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.55rem 0.95rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid var(--primary-blue-border);
+        box-shadow: 0 10px 24px rgba(23, 50, 77, 0.06);
+        color: var(--text-main);
+        font-size: 0.9rem;
         font-weight: 600;
     }
 
+    .info-card {
+        padding: 1.15rem 1.2rem;
+        border-radius: 24px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(240,248,255,0.96) 100%);
+        border: 1px solid var(--primary-blue-border);
+        box-shadow: var(--shadow-card);
+        min-height: 100%;
+    }
+
+    .info-card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 0.45rem;
+    }
+
+    .info-card-copy {
+        font-size: 0.92rem;
+        line-height: 1.7;
+        color: var(--text-soft);
+    }
+
+    .result-banner {
+        padding: 1.15rem 1.25rem;
+        border-radius: 24px;
+        border: 1px solid var(--primary-blue-border);
+        background: linear-gradient(135deg, rgba(231,242,255,0.95) 0%, rgba(255,255,255,0.95) 100%);
+        box-shadow: var(--shadow-card);
+        margin: 0.35rem 0 1rem 0;
+    }
+
+    .result-banner-title {
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--primary-blue);
+        margin-bottom: 0.35rem;
+    }
+
+    .result-banner-copy {
+        font-size: 1rem;
+        line-height: 1.75;
+        color: var(--text-main);
+    }
+
+    .hero-visual-shell {
+        padding: 1rem;
+        border-radius: var(--radius-xl);
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        background: linear-gradient(145deg, rgba(13,94,168,0.95) 0%, rgba(41,129,203,0.94) 55%, rgba(47,176,156,0.9) 100%);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .hero-visual-inner {
+        border-radius: 26px;
+        background: rgba(255, 255, 255, 0.94);
+        min-height: 320px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.2rem;
+    }
+
+    .hero-visual-inner img {
+        width: 100%;
+        max-height: 360px;
+        object-fit: contain;
+        display: block;
+        border-radius: 22px;
+        box-shadow: 0 18px 45px rgba(23, 50, 77, 0.10);
+    }
+
     .stButton > button {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, #2b7de0 100%);
+        background: linear-gradient(135deg, var(--primary-blue) 0%, #2575c8 100%);
         color: #ffffff;
         border-radius: 999px;
         border: none;
-        box-shadow: var(--shadow-soft);
+        box-shadow: 0 16px 40px rgba(13, 94, 168, 0.25);
         font-weight: 700;
         width: 100%;
-        min-height: 2.9rem;
+        min-height: 3rem;
         padding: 0.7rem 1rem;
         transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
@@ -106,7 +286,7 @@ st.markdown("""
         background: linear-gradient(135deg, var(--primary-blue-dark) 0%, var(--primary-blue) 100%);
         color: #ffffff;
         transform: translateY(-1px);
-        box-shadow: 0 14px 32px rgba(11, 99, 206, 0.14);
+        box-shadow: 0 20px 42px rgba(13, 94, 168, 0.28);
     }
 
     .stTextInput > div > div > input,
@@ -116,11 +296,11 @@ st.markdown("""
     .stMultiSelect > div > div,
     .stDateInput > div > div,
     .stFileUploader > div {
-        background-color: var(--surface-white);
+        background-color: rgba(255, 255, 255, 0.96);
         color: var(--text-main);
         border: 1px solid var(--primary-blue-border);
         border-radius: var(--radius-md);
-        box-shadow: var(--shadow-soft);
+        box-shadow: 0 12px 30px rgba(23, 50, 77, 0.05);
     }
 
     .stTextInput > div > div > input:focus,
@@ -139,7 +319,7 @@ st.markdown("""
     .stSuccess {
         background-color: var(--success-bg);
         color: var(--text-main);
-        border: 1px solid var(--primary-blue-border);
+        border: 1px solid #bde3cd;
         border-radius: var(--radius-md);
     }
 
@@ -158,11 +338,11 @@ st.markdown("""
     }
 
     [data-baseweb="tab"] {
-        background-color: rgba(255, 255, 255, 0.68);
+        background-color: rgba(255, 255, 255, 0.7);
         color: var(--primary-blue);
         border-radius: 999px;
         border: 1px solid transparent;
-        font-weight: 600;
+        font-weight: 700;
         padding-left: 1rem;
         padding-right: 1rem;
     }
@@ -183,25 +363,21 @@ st.markdown("""
         border: 1px solid var(--primary-blue-border);
         border-radius: var(--radius-lg);
         padding: 1rem;
-        box-shadow: var(--shadow-soft);
-    }
-
-    [data-testid="stVerticalBlock"] > [data-testid="stVerticalBlockBorderWrapper"] {
-        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
     }
 
     [data-testid="stExpander"] {
-        background: var(--surface-white);
+        background: rgba(255, 255, 255, 0.96);
         border: 1px solid var(--primary-blue-border);
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-soft);
+        box-shadow: var(--shadow-card);
     }
 
     .stDataFrame, .stTable {
-        background: var(--surface-white);
+        background: var(--surface-strong);
         border-radius: var(--radius-lg);
         overflow: hidden;
-        box-shadow: var(--shadow-soft);
+        box-shadow: var(--shadow-card);
     }
 
     hr {
@@ -211,6 +387,11 @@ st.markdown("""
     .stCaption {
         color: var(--text-soft);
     }
+
+    .stImage img {
+        border-radius: 28px;
+        box-shadow: var(--shadow-card);
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -219,6 +400,84 @@ def decimal_input(label, **kwargs):
     kwargs.setdefault("step", 0.01)
     kwargs.setdefault("format", "%.2f")
     return st.number_input(label, **kwargs)
+
+
+def asset_path(filename):
+    return str(BASE_DIR / filename)
+
+
+def image_to_data_uri(filename):
+    file_path = BASE_DIR / filename
+    extension = file_path.suffix.lower().lstrip(".") or "png"
+    mime_type = "image/jpeg" if extension in {"jpg", "jpeg"} else f"image/{extension}"
+    encoded = base64.b64encode(file_path.read_bytes()).decode("utf-8")
+    return f"data:{mime_type};base64,{encoded}"
+
+
+def render_page_hero(title, eyebrow, description, chips=None, image_name=None):
+    chips = chips or []
+
+    if image_name:
+        left_col, right_col = st.columns([1.35, 0.65], gap="large")
+    else:
+        left_col = st.container()
+        right_col = None
+
+    with left_col:
+        chip_markup = "".join(
+            f"<span class='hero-chip'>{chip}</span>" for chip in chips
+        )
+        st.markdown(
+            f"""
+            <div class="hero-card">
+                <div class="hero-kicker">{eyebrow}</div>
+                <div class="hero-title">{title}</div>
+                <div class="hero-copy">{description}</div>
+                <div class="hero-chip-row">{chip_markup}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    if right_col and image_name:
+        with right_col:
+            st.markdown(
+                f"""
+                <div class="hero-visual-shell">
+                    <div class="hero-visual-inner">
+                        <img src="{image_to_data_uri(image_name)}" alt="{title}">
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+
+def render_info_cards(cards):
+    columns = st.columns(len(cards), gap="large")
+    for column, card in zip(columns, cards):
+        with column:
+            st.markdown(
+                f"""
+                <div class="info-card">
+                    <div class="info-card-title">{card["title"]}</div>
+                    <div class="info-card-copy">{card["copy"]}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+
+def render_result_banner(title, copy):
+    st.markdown(
+        f"""
+        <div class="result-banner">
+            <div class="result-banner-title">{title}</div>
+            <div class="result-banner-copy">{copy}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def get_positive_probability(model, model_input, positive_label=1):
@@ -375,6 +634,18 @@ lung_cancer_model = joblib.load('models/lung_cancer_model.sav')
 
 # sidebar
 with st.sidebar:
+    st.markdown(
+        """
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-kicker">Smart Care</div>
+            <div class="sidebar-brand-title">Disease Prediction Suite</div>
+            <div class="sidebar-brand-copy">
+                Explore multiple prediction models from one modern screening workspace.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     selected = option_menu('Multiple Disease Prediction', [
         'Disease Prediction',
         'Diabetes Prediction',
@@ -388,7 +659,30 @@ with st.sidebar:
 
     ],
         icons=['', 'activity', 'heart', 'person', 'person', 'person', 'person', 'person', 'bar-chart-fill'],
-        default_index=0)
+        default_index=0,
+        styles={
+            "container": {
+                "padding": "0.35rem",
+                "background-color": "rgba(255,255,255,0.68)",
+                "border": "1px solid #cfe1f5",
+                "border-radius": "24px",
+                "box-shadow": "0 18px 45px rgba(23, 50, 77, 0.08)",
+            },
+            "icon": {"color": "#0d5ea8", "font-size": "16px"},
+            "nav-link": {
+                "font-size": "15px",
+                "font-weight": "600",
+                "text-align": "left",
+                "margin": "0.25rem 0",
+                "padding": "0.7rem 0.95rem",
+                "border-radius": "16px",
+                "--hover-color": "#e7f2ff",
+            },
+            "nav-link-selected": {
+                "background": "linear-gradient(135deg, #0d5ea8 0%, #2575c8 100%)",
+                "color": "white",
+            },
+        })
 
 
 
@@ -399,8 +693,35 @@ if selected == 'Disease Prediction':
     disease_model = DiseaseModel()
     disease_model.load_xgboost('model/xgboost_model.json')
 
-    # Title
-    st.write('# Disease Prediction using Machine Learning')
+    render_page_hero(
+        title="Modern symptom-based disease prediction.",
+        eyebrow="Core Screening Flow",
+        description=(
+            "Select symptoms, run the machine learning model, and review risk guidance "
+            "inside a cleaner clinical-style interface designed for quick understanding."
+        ),
+        chips=["Symptom triage", "Confidence scoring", "Risk explanation", "Groq-ready insights"],
+        image_name="logo.png",
+    )
+    render_info_cards(
+        [
+            {
+                "title": "Choose symptoms carefully",
+                "copy": "Select at least three symptoms to give the model enough context for a more reliable prediction.",
+            },
+            {
+                "title": "Review risk, not diagnosis",
+                "copy": "Predictions estimate likelihood and should be used as a decision-support layer, not a confirmed medical result.",
+            },
+            {
+                "title": "Use the explanation tabs",
+                "copy": "Read the disease description, precaution advice, and optional Groq explanation for a clearer next step.",
+            },
+        ]
+    )
+
+    st.markdown("### Symptom selection")
+    st.caption("Tip: use `high_fever` or `mild_fever` instead of just `fever`.")
 
     symptoms = st.multiselect(
         'What are your symptoms?',
@@ -409,6 +730,13 @@ if selected == 'Disease Prediction':
     )
 
     X = prepare_symptoms_array(symptoms)
+    metric_col1, metric_col2, metric_col3 = st.columns(3)
+    with metric_col1:
+        st.metric("Symptoms Selected", len(symptoms))
+    with metric_col2:
+        st.metric("Minimum Recommended", "3")
+    with metric_col3:
+        st.metric("Model", "XGBoost")
 
     # Trigger XGBoost model
     if st.button('Predict'):
@@ -419,9 +747,22 @@ if selected == 'Disease Prediction':
             pred = disease_model.predict_with_risk(X)
             if pred["probability"] < 0.40:
                 st.warning("Low confidence prediction. Add more symptoms for better accuracy.")
-            st.write(f'## Disease: {pred["disease"]}')
-            st.write(f'Probability: {pred["probability_percent"]:.2f}%')
-            st.write(f'Risk Category: {pred["risk_category"]}')
+            render_result_banner(
+                "Prediction summary",
+                (
+                    f"The model currently suggests <strong>{pred['disease']}</strong> "
+                    f"with a confidence score of <strong>{pred['probability_percent']:.2f}%</strong> "
+                    f"and a <strong>{pred['risk_category']}</strong> risk category."
+                ),
+            )
+
+            result_col1, result_col2, result_col3 = st.columns(3)
+            with result_col1:
+                st.metric("Predicted Disease", pred["disease"])
+            with result_col2:
+                st.metric("Confidence", f'{pred["probability_percent"]:.2f}%')
+            with result_col3:
+                st.metric("Risk Category", pred["risk_category"])
 
             tab1, tab2, tab3 = st.tabs(["Description", "Precautions", "Groq Agent Description"])
 
@@ -442,9 +783,13 @@ if selected == 'Disease Prediction':
 
 # Diabetes prediction page
 if selected == 'Diabetes Prediction':  # pagetitle
-    st.title("Diabetes disease prediction")
-    image = Image.open('d3.jpg')
-    st.image(image, caption='diabetes disease prediction')
+    render_page_hero(
+        title="Diabetes disease prediction",
+        eyebrow="Metabolic Health",
+        description="Enter the patient indicators below to estimate diabetes risk with a cleaner modern screening layout.",
+        chips=["Glucose", "BMI", "Age", "Insulin"],
+        image_name="d3.jpg",
+    )
     # columns
     # no inputs from the user
     name = st.text_input("Name:")
@@ -499,9 +844,13 @@ if selected == 'Diabetes Prediction':  # pagetitle
 
 # Heart prediction page
 if selected == 'Heart disease Prediction':
-    st.title("Heart disease prediction")
-    image = Image.open('heart2.jpg')
-    st.image(image, caption='heart failuire')
+    render_page_hero(
+        title="Heart disease prediction",
+        eyebrow="Cardiac Risk",
+        description="Capture cardiovascular indicators, exercise-related features, and ECG context to review heart disease risk.",
+        chips=["Blood pressure", "Cholesterol", "ECG", "Exercise angina"],
+        image_name="heart2.jpg",
+    )
     # age	sex	cp	trestbps	chol	fbs	restecg	thalach	exang	oldpeak	slope	ca	thal	target
     # columns
     # no inputs from the user
@@ -627,9 +976,13 @@ if selected == 'Heart disease Prediction':
 
 
 if selected == 'Parkison Prediction':
-    st.title("Parkison prediction")
-    image = Image.open('p1.jpg')
-    st.image(image, caption='parkinsons disease')
+    render_page_hero(
+        title="Parkinson prediction",
+        eyebrow="Neurological Screening",
+        description="Use the voice and tremor-related measurements below to estimate Parkinson's disease risk.",
+        chips=["Voice metrics", "Jitter", "Shimmer", "Motor risk"],
+        image_name="p1.jpg",
+    )
   # parameters
 #    name	MDVP:Fo(Hz)	MDVP:Fhi(Hz)	MDVP:Flo(Hz)	MDVP:Jitter(%)	MDVP:Jitter(Abs)	MDVP:RAP	MDVP:PPQ	Jitter:DDP	MDVP:Shimmer	MDVP:Shimmer(dB)	Shimmer:APQ3	Shimmer:APQ5	MDVP:APQ	Shimmer:DDA	NHR	HNR	status	RPDE	DFA	spread1	spread2	D2	PPE
    # change the variables according to the dataset used in the model
@@ -714,9 +1067,13 @@ lung_cancer_data['GENDER'] = lung_cancer_data['GENDER'].map({'M': 'Male', 'F': '
 
 # Lung Cancer prediction page
 if selected == 'Lung Cancer Prediction':
-    st.title("Lung Cancer Prediction")
-    image = Image.open('h.png')
-    st.image(image, caption='Lung Cancer Prediction')
+    render_page_hero(
+        title="Lung cancer prediction",
+        eyebrow="Respiratory Screening",
+        description="Combine symptom and lifestyle indicators to review lung cancer risk through the trained model.",
+        chips=["Smoking", "Chest pain", "Breathing", "Coughing"],
+        image_name="h.png",
+    )
 
     # Columns
     # No inputs from the user
@@ -813,9 +1170,13 @@ if selected == 'Lung Cancer Prediction':
 
 # Liver prediction page
 if selected == 'Liver prediction':  # pagetitle
-    st.title("Liver disease prediction")
-    image = Image.open('liver.jpg')
-    st.image(image, caption='Liver disease prediction.')
+    render_page_hero(
+        title="Liver disease prediction",
+        eyebrow="Hepatic Assessment",
+        description="Provide liver-related biomarkers and history inputs to estimate disease risk with the ML model.",
+        chips=["Bilirubin", "Enzymes", "Proteins", "Age"],
+        image_name="liver.jpg",
+    )
     # columns
     # no inputs from the user
 # st.write(info.astype(int).info())
@@ -878,9 +1239,13 @@ if selected == 'Liver prediction':  # pagetitle
 
 # Hepatitis prediction page
 if selected == 'Hepatitis prediction':
-    st.title("Hepatitis Prediction")
-    image = Image.open('h.png')
-    st.image(image, caption='Hepatitis Prediction')
+    render_page_hero(
+        title="Hepatitis prediction",
+        eyebrow="Liver Infection Screening",
+        description="Review blood chemistry and liver function markers to estimate hepatitis risk in a modern panel layout.",
+        chips=["ALT", "AST", "BIL", "GGT"],
+        image_name="h.png",
+    )
 
     # Columns
     # No inputs from the user
@@ -1036,8 +1401,12 @@ import joblib
 
 # Chronic Kidney Disease Prediction Page
 if selected == 'Chronic Kidney prediction':
-    st.title("Chronic Kidney Disease Prediction")
-    # Add the image for Chronic Kidney Disease prediction if needed
+    render_page_hero(
+        title="Chronic kidney disease prediction",
+        eyebrow="Renal Health",
+        description="Screen kidney disease risk using laboratory markers, blood pressure, and related health factors.",
+        chips=["Creatinine", "Hemoglobin", "Blood pressure", "Diabetes"],
+    )
     name = st.text_input("Name:")
     # Columns
     # No inputs from the user
@@ -1160,7 +1529,12 @@ if selected == 'Chronic Kidney prediction':
 
 # Breast Cancer Prediction Page
 if selected == 'Breast Cancer Prediction':
-    st.title("Breast Cancer Prediction")
+    render_page_hero(
+        title="Breast cancer prediction",
+        eyebrow="Oncology Screening",
+        description="Enter tumor feature measurements to generate a breast cancer risk estimate from the trained model.",
+        chips=["Radius", "Texture", "Area", "Concavity"],
+    )
     name = st.text_input("Name:")
     # Columns
     # No inputs from the user

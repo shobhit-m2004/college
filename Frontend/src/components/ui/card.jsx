@@ -1,39 +1,67 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { ArrowRight, BriefcaseMedical, CircleDollarSign } from "lucide-react";
+import {
+  getDoctorExperience,
+  getDoctorFee,
+  getDoctorImage,
+  getDoctorName,
+} from "../../lib/doctor";
 
 const Card = ({ item }) => {
   const navigate = useNavigate();
+  const doctorName = getDoctorName(item);
+  const doctorImage = getDoctorImage(item);
+  const doctorExperience = getDoctorExperience(item);
+  const doctorFee = getDoctorFee(item);
 
   return (
-    <div onClick={() => navigate(`/appointment/${item._id}`)}>
-      <div className="card bg-base-100 w-full h-full shadow-md hover:shadow-2xl rounded-2xl">
-        <figure>
+    <button
+      onClick={() => navigate(`/appointment/${item._id}`)}
+      className="group text-left"
+    >
+      <div className="h-full overflow-hidden rounded-[28px] border border-slate-200 bg-white shadow-[0_16px_45px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_24px_60px_rgba(56,109,176,0.14)]">
+        <div className="relative overflow-hidden rounded-b-[28px] bg-gradient-to-br from-sky-50 via-white to-emerald-50 px-5 pt-5">
+          <div
+            className={`absolute right-5 top-5 rounded-full px-3 py-1 text-xs font-semibold ${
+              item.available
+                ? "bg-emerald-100 text-emerald-700"
+                : "bg-rose-100 text-rose-700"
+            }`}
+          >
+            {item.available ? "Available" : "Unavailable"}
+          </div>
           <img
-            className="w-full h-full aspect-square object-contain"
-            src={item.image}
-            alt="doctor"
+            className="mx-auto aspect-square w-full max-w-[220px] object-contain transition duration-300 group-hover:scale-[1.03]"
+            src={doctorImage}
+            alt={doctorName}
           />
-        </figure>
+        </div>
 
-        <div className="card-body">
-          <h2 className="card-title flex justify-between items-center">
-            <p>
-              {item.firstName} {item.lastName}
-            </p>
+        <div className="space-y-4 p-5">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">{doctorName}</h3>
+            <p className="mt-1 text-sm text-slate-500">{item.speciality}</p>
+          </div>
 
-            <div
-              className={`px-2 py-1 w-auto h-7 rounded-3xl text-xs flex items-center text-white ${
-                item.available ? "bg-green-500" : "bg-red-500"
-              }`}
-            >
-              {item.available ? "Available" : "Unavailable"}
-            </div>
-          </h2>
+          <div className="flex flex-wrap gap-2 text-sm">
+            <span className="soft-chip">
+              <BriefcaseMedical className="h-4 w-4 text-sky-700" />
+              {doctorExperience}
+            </span>
+            <span className="soft-chip">
+              <CircleDollarSign className="h-4 w-4 text-emerald-700" />
+              {doctorFee}
+            </span>
+          </div>
 
-          <p>{item.speciality}</p>
+          <div className="flex items-center justify-between pt-1 text-sm font-semibold text-sky-700">
+            <span>View booking slots</span>
+            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+          </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 

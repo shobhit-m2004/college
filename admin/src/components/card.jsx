@@ -2,43 +2,59 @@ import React from "react";
 
 const Card = ({ item, changeAvailability }) => {
   return (
-    <div className="w-full max-w-sm bg-white shadow-lg rounded-2xl overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-xl mx-4 my-4">
-      {/* Image Section */}
-      <div className="relative w-full aspect-square overflow-hidden">
+    <div className="admin-panel-soft overflow-hidden">
+      <div className="relative aspect-[1/1] overflow-hidden bg-gradient-to-br from-sky-50 via-white to-emerald-50">
         <img
-          className="w-full h-full object-cover"
+          className="h-full w-full object-cover"
           src={item.image}
           alt={`${item.firstName} ${item.lastName}`}
         />
 
-        {/* Availability Badge */}
         <div
-          className={`absolute top-3 right-3 px-3 py-1 text-sm font-medium rounded-full ${
+          className={`absolute right-4 top-4 rounded-full px-3 py-1 text-xs font-bold ${
             item.available
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
+              ? "bg-emerald-100 text-emerald-700"
+              : "bg-rose-100 text-rose-700"
           }`}
         >
           {item.available ? "Available" : "Unavailable"}
         </div>
       </div>
 
-      {/* Info Section */}
-      <div className="p-4">
-        <h2 className="text-lg font-semibold text-gray-800">
-          {item.firstName} {item.lastName}
-        </h2>
-        <p className="text-gray-600 mt-1">{item.speciality}</p>
+      <div className="space-y-4 p-5">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">
+            {item.firstName} {item.lastName}
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">{item.speciality}</p>
+        </div>
 
-        <div className="mt-4 flex items-center gap-2">
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+              Experience
+            </p>
+            <p className="mt-1 font-semibold text-slate-700">{item.experience}</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">
+              Fees
+            </p>
+            <p className="mt-1 font-semibold text-slate-700">Rs. {item.fees}</p>
+          </div>
+        </div>
+
+        <label className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3">
+          <span className="text-sm font-semibold text-slate-700">
+            Currently Available
+          </span>
           <input
             onChange={() => changeAvailability(item._id)}
             type="checkbox"
             checked={item.available}
-            className="w-4 h-4 accent-green-600"
+            className="h-4 w-4 accent-sky-600"
           />
-          <span className="text-sm text-gray-700">Currently Available</span>
-        </div>
+        </label>
       </div>
     </div>
   );

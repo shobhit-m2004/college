@@ -8,11 +8,12 @@ const DoctorProfile = () => {
     useContext(DoctorContext);
   const [isEdit, setIsEdit] = useState(false);
   const [image, setImage] = useState(null);
+
   const updateProfile = async () => {
     const formData = new FormData();
 
     formData.append("userId", doctorData._id);
-    formData.append("image", image);
+    if (image) formData.append("image", image);
     formData.append("firstName", doctorData.firstName);
     formData.append("lastName", doctorData.lastName);
     formData.append("email", doctorData.email);
@@ -25,8 +26,8 @@ const DoctorProfile = () => {
 
     try {
       const { data } = await axios.patch(
-        backendUrl + "/api/doctor/update-profile",
-        formData, // <-- SEND DIRECTLY
+        `${backendUrl}/api/doctor/update-profile`,
+        formData,
         {
           headers: {
             dtoken: dToken,
@@ -50,8 +51,7 @@ const DoctorProfile = () => {
 
   return (
     doctorData && (
-      <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-6 space-y-6">
-        {/* Profile Image */}
+      <section className="admin-panel mx-auto max-w-4xl px-6 py-8 sm:px-8">
         <div className="flex flex-col items-center">
           {isEdit ? (
             <div>
@@ -61,7 +61,7 @@ const DoctorProfile = () => {
                     <img
                       src={URL.createObjectURL(image)}
                       alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                      className="h-24 w-24 rounded-full border-2 border-slate-200 object-cover"
                     />
                   ) : (
                     <img
@@ -70,7 +70,7 @@ const DoctorProfile = () => {
                         "https://img.freepik.com/premium-vector/gray-picture-person-with-gray-background_1197690-22.jpg"
                       }
                       alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                      className="h-24 w-24 rounded-full border-2 border-slate-200 object-cover"
                     />
                   )}
                 </div>
@@ -90,12 +90,12 @@ const DoctorProfile = () => {
                 "https://img.freepik.com/premium-vector/gray-picture-person-with-gray-background_1197690-22.jpg"
               }
               alt="Profile"
-              className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+              className="h-24 w-24 rounded-full border-2 border-slate-200 object-cover"
             />
           )}
 
           {isEdit ? (
-            <div className="flex gap-2 mt-4">
+            <div className="mt-4 flex gap-2">
               <input
                 value={doctorData.firstName || ""}
                 onChange={(e) =>
@@ -105,7 +105,7 @@ const DoctorProfile = () => {
                   }))
                 }
                 type="text"
-                className="border rounded-md px-2 py-1"
+                className="admin-input"
               />
               <input
                 value={doctorData.lastName || ""}
@@ -116,229 +116,209 @@ const DoctorProfile = () => {
                   }))
                 }
                 type="text"
-                className="border rounded-md px-2 py-1"
+                className="admin-input"
               />
             </div>
           ) : (
-            <p className="mt-4 text-xl font-semibold">
+            <p className="mt-4 text-2xl font-semibold text-slate-900">
               {doctorData.firstName + " " + doctorData.lastName}
             </p>
           )}
         </div>
 
-        <hr className="border-gray-300" />
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="admin-panel-soft p-5">
+            <h2 className="text-lg font-semibold text-slate-900">Contact Information</h2>
+            <div className="mt-4 space-y-4 text-sm text-slate-600">
+              <div>
+                <p className="font-semibold text-slate-900">Email ID</p>
+                <p>{doctorData.email}</p>
+              </div>
 
-        {/* Contact Info */}
-        <div className="space-y-2">
-          <p className="text-lg font-semibold text-gray-700">
-            Contact Information
-          </p>
-          <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-            <div>
-              <p className="text-gray-600 font-medium">Email ID:</p>
-              <p className="text-gray-800">{doctorData.email}</p>
-            </div>
-
-            <div>
-              <p className="text-gray-600 font-medium">Phone:</p>
-              {isEdit ? (
-                <input
-                  value={doctorData.phone || ""}
-                  onChange={(e) =>
-                    setDoctorData((prev) => ({
-                      ...prev,
-                      phone: e.target.value,
-                    }))
-                  }
-                  type="text"
-                  className="border rounded-md px-2 py-1 w-full"
-                />
-              ) : (
-                <p className="text-gray-800">{doctorData.phone || "N/A"}</p>
-              )}
-            </div>
-
-            <div>
-              <p className="text-gray-600 font-medium">Address:</p>
-              {isEdit ? (
-                <div className="space-y-2">
-                  <p>Line 1:</p>
+              <div>
+                <p className="font-semibold text-slate-900">Phone</p>
+                {isEdit ? (
                   <input
-                    value={doctorData.address?.line1 || ""}
+                    value={doctorData.phone || ""}
                     onChange={(e) =>
                       setDoctorData((prev) => ({
                         ...prev,
-                        address: { ...prev.address, line1: e.target.value },
+                        phone: e.target.value,
                       }))
                     }
                     type="text"
-                    className="border rounded-md px-2 py-1 w-full"
+                    className="admin-input mt-2"
                   />
-                  <p>Line 2:</p>
+                ) : (
+                  <p>{doctorData.phone || "N/A"}</p>
+                )}
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">Address</p>
+                {isEdit ? (
+                  <div className="mt-2 space-y-2">
+                    <input
+                      value={doctorData.address?.line1 || ""}
+                      onChange={(e) =>
+                        setDoctorData((prev) => ({
+                          ...prev,
+                          address: { ...prev.address, line1: e.target.value },
+                        }))
+                      }
+                      type="text"
+                      className="admin-input"
+                    />
+                    <input
+                      value={doctorData.address?.line2 || ""}
+                      onChange={(e) =>
+                        setDoctorData((prev) => ({
+                          ...prev,
+                          address: { ...prev.address, line2: e.target.value },
+                        }))
+                      }
+                      type="text"
+                      className="admin-input"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <p>{doctorData.address?.line1}</p>
+                    <p>{doctorData.address?.line2}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="admin-panel-soft p-5">
+            <h2 className="text-lg font-semibold text-slate-900">Professional Details</h2>
+
+            <div className="mt-4 space-y-4 text-sm text-slate-600">
+              <div>
+                <p className="font-semibold text-slate-900">Speciality</p>
+                {isEdit ? (
                   <input
-                    value={doctorData.address?.line2 || ""}
+                    value={doctorData.speciality || ""}
                     onChange={(e) =>
                       setDoctorData((prev) => ({
                         ...prev,
-                        address: { ...prev.address, line2: e.target.value },
+                        speciality: e.target.value,
                       }))
                     }
                     type="text"
-                    className="border rounded-md px-2 py-1 w-full"
+                    className="admin-input mt-2"
                   />
-                </div>
-              ) : (
-                <div className="text-gray-800">
-                  <p>{doctorData.address?.line1}</p>
-                  <p>{doctorData.address?.line2}</p>
-                </div>
-              )}
+                ) : (
+                  <p>{doctorData.speciality || "N/A"}</p>
+                )}
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">Degree</p>
+                {isEdit ? (
+                  <input
+                    value={doctorData.degree || ""}
+                    onChange={(e) =>
+                      setDoctorData((prev) => ({
+                        ...prev,
+                        degree: e.target.value,
+                      }))
+                    }
+                    type="text"
+                    className="admin-input mt-2"
+                  />
+                ) : (
+                  <p>{doctorData.degree || "N/A"}</p>
+                )}
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">Experience (Years)</p>
+                {isEdit ? (
+                  <input
+                    value={doctorData.experience || ""}
+                    onChange={(e) =>
+                      setDoctorData((prev) => ({
+                        ...prev,
+                        experience: e.target.value,
+                      }))
+                    }
+                    type="number"
+                    className="admin-input mt-2"
+                  />
+                ) : (
+                  <p>{doctorData.experience || "N/A"} years</p>
+                )}
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">Consultation Fees</p>
+                {isEdit ? (
+                  <input
+                    value={doctorData.fees || ""}
+                    onChange={(e) =>
+                      setDoctorData((prev) => ({
+                        ...prev,
+                        fees: e.target.value,
+                      }))
+                    }
+                    type="number"
+                    className="admin-input mt-2"
+                  />
+                ) : (
+                  <p>Rs. {doctorData.fees || "N/A"}</p>
+                )}
+              </div>
+
+              <div>
+                <p className="font-semibold text-slate-900">About</p>
+                {isEdit ? (
+                  <textarea
+                    value={doctorData.about || ""}
+                    onChange={(e) =>
+                      setDoctorData((prev) => ({
+                        ...prev,
+                        about: e.target.value,
+                      }))
+                    }
+                    className="admin-input mt-2 resize-none"
+                    rows="5"
+                  ></textarea>
+                ) : (
+                  <p>{doctorData.about || "N/A"}</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Basic Info */}
-
-        {/* NEW — Professional Details */}
-        <div className="space-y-2">
-          <p className="text-lg font-semibold text-gray-700">
-            Professional Details
-          </p>
-
-          <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-            {/* Speciality */}
-            <div>
-              <p className="text-gray-600 font-medium">Speciality:</p>
-              {isEdit ? (
-                <input
-                  value={doctorData.speciality || ""}
-                  onChange={(e) =>
-                    setDoctorData((prev) => ({
-                      ...prev,
-                      speciality: e.target.value,
-                    }))
-                  }
-                  type="text"
-                  className="border rounded-md px-2 py-1 w-full"
-                />
-              ) : (
-                <p className="text-gray-800">
-                  {doctorData.speciality || "N/A"}
-                </p>
-              )}
-            </div>
-
-            {/* Degree */}
-            <div>
-              <p className="text-gray-600 font-medium">Degree:</p>
-              {isEdit ? (
-                <input
-                  value={doctorData.degree || ""}
-                  onChange={(e) =>
-                    setDoctorData((prev) => ({
-                      ...prev,
-                      degree: e.target.value,
-                    }))
-                  }
-                  type="text"
-                  className="border rounded-md px-2 py-1 w-full"
-                />
-              ) : (
-                <p className="text-gray-800">{doctorData.degree || "N/A"}</p>
-              )}
-            </div>
-
-            {/* Experience */}
-            <div>
-              <p className="text-gray-600 font-medium">Experience (Years):</p>
-              {isEdit ? (
-                <input
-                  value={doctorData.experience || ""}
-                  onChange={(e) =>
-                    setDoctorData((prev) => ({
-                      ...prev,
-                      experience: e.target.value,
-                    }))
-                  }
-                  type="number"
-                  className="border rounded-md px-2 py-1 w-full"
-                />
-              ) : (
-                <p className="text-gray-800">
-                  {doctorData.experience || "N/A"} years
-                </p>
-              )}
-            </div>
-
-            {/* Fees */}
-            <div>
-              <p className="text-gray-600 font-medium">Consultation Fees:</p>
-              {isEdit ? (
-                <input
-                  value={doctorData.fees || ""}
-                  onChange={(e) =>
-                    setDoctorData((prev) => ({
-                      ...prev,
-                      fees: e.target.value,
-                    }))
-                  }
-                  type="number"
-                  className="border rounded-md px-2 py-1 w-full"
-                />
-              ) : (
-                <p className="text-gray-800">₹{doctorData.fees || "N/A"}</p>
-              )}
-            </div>
-
-            {/* About */}
-            <div>
-              <p className="text-gray-600 font-medium">About:</p>
-              {isEdit ? (
-                <textarea
-                  value={doctorData.about || ""}
-                  onChange={(e) =>
-                    setDoctorData((prev) => ({
-                      ...prev,
-                      about: e.target.value,
-                    }))
-                  }
-                  className="border rounded-md px-2 py-1 w-full"
-                  rows="4"
-                ></textarea>
-              ) : (
-                <p className="text-gray-800">{doctorData.about || "N/A"}</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Buttons */}
-        <div className="flex justify-end gap-3">
+        <div className="mt-6 flex justify-end gap-3">
           {!isEdit ? (
-            <button
-              onClick={() => setIsEdit(true)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
-            >
+            <button onClick={() => setIsEdit(true)} className="admin-primary-btn">
               Edit
             </button>
           ) : (
             <>
               <button
                 onClick={() => setIsEdit(false)}
-                className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition"
+                className="admin-secondary-btn"
               >
                 Cancel
               </button>
               <button
-                onClick={() => (setIsEdit(false), updateProfile())}
-                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
+                onClick={() => {
+                  setIsEdit(false);
+                  updateProfile();
+                }}
+                className="admin-primary-btn bg-emerald-600 hover:bg-emerald-500"
               >
                 Save Info
               </button>
             </>
           )}
         </div>
-      </div>
+      </section>
     )
   );
 };

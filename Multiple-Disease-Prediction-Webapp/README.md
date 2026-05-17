@@ -14,16 +14,23 @@ Please follow the below steps to run this project.
 <br>
 
 1. `pip install -r Frontend/requirements.txt`<br>
-2. `pip install -r Frontend/requirements-grok.txt`<br>
-3. Paste your Groq key in `Frontend/.env` as `GROQ_API_KEY=your_key_here`<br>
-4. `cd Frontend`<br>
-5. `streamlit run app.py`<br><br>
+2. Paste your Groq key in `Frontend/.env` as `GROQ_API_KEY=your_key_here` if you want AI explanations<br>
+3. `cd Frontend`<br>
+4. `streamlit run app.py`<br><br>
+
+### Streamlit Community Cloud
+
+1. Push this repository to GitHub.<br>
+2. In Streamlit Community Cloud, create a new app from this repo.<br>
+3. Set the main file path to `streamlit_app.py`.<br>
+4. In app secrets, optionally add `GROQ_API_KEY="your_key_here"` and `GROQ_MODEL="llama-3.3-70b-versatile"`.<br>
+5. Deploy the app, then copy the public Streamlit URL and use it in the React frontend as `VITE_DISEASE_PREDICTION_URL`.<br><br>
 
 ### Groq Agent Description Layer
 
 - The Disease Prediction page includes a `Groq Agent Description` tab.
 - It uses Groq's direct Chat Completions API in a two-step agent flow, where one agent drafts triage notes and a second agent rewrites them into a patient-friendly explanation.
-- The app reads `GROQ_API_KEY` and `GROQ_MODEL` from `Frontend/.env`.
+- The app reads `GROQ_API_KEY` and `GROQ_MODEL` from `Frontend/.env` or Streamlit secrets.
 - If the key is missing, the rest of the app still works and the Groq tab shows setup guidance.
 
 ### Platform, Libraries and Frameworks used

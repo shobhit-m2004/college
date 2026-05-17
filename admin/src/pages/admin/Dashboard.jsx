@@ -10,98 +10,94 @@ const Dashboard = () => {
     if (aToken) getDashData();
   }, [aToken]);
 
+  if (!dashData) return null;
+
+  const stats = [
+    { label: "Doctors", value: dashData.doctors, icon: assets.doctor_icon },
+    {
+      label: "Appointments",
+      value: dashData.appointments,
+      icon: assets.appointment_icon,
+    },
+    { label: "Patients", value: dashData.patients, icon: assets.patients_icon },
+  ];
+
   return (
-    dashData && (
-      <div className="p-6 space-y-10">
-        {/* Top Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Doctors */}
-          <div className="flex items-center gap-4 p-5 bg-white shadow-md rounded-xl hover:shadow-lg transition">
-            <img src={assets.doctor_icon} className="w-14 h-14" />
-            <div>
-              <p className="text-3xl font-bold text-gray-800">
-                {dashData.doctors}
-              </p>
-              <p className="text-gray-500 text-sm">Doctors</p>
-            </div>
-          </div>
-
-          {/* Appointments */}
-          <div className="flex items-center gap-4 p-5 bg-white shadow-md rounded-xl hover:shadow-lg transition">
-            <img src={assets.appointment_icon} className="w-14 h-14" />
-            <div>
-              <p className="text-3xl font-bold text-gray-800">
-                {dashData.appointments}
-              </p>
-              <p className="text-gray-500 text-sm">Appointments</p>
-            </div>
-          </div>
-
-          {/* Patients */}
-          <div className="flex items-center gap-4 p-5 bg-white shadow-md rounded-xl hover:shadow-lg transition">
-            <img src={assets.patients_icon} className="w-14 h-14" />
-            <div>
-              <p className="text-3xl font-bold text-gray-800">
-                {dashData.patients}
-              </p>
-              <p className="text-gray-500 text-sm">Patients</p>
-            </div>
-          </div>
+    <div className="space-y-6">
+      <section className="admin-panel px-6 py-8 sm:px-8">
+        <div className="space-y-3">
+          <span className="admin-kicker">Operations overview</span>
+          <h1 className="admin-title">Monitor doctors, patients, and fresh bookings</h1>
+          <p className="admin-copy max-w-3xl">
+            Stay on top of platform activity with a cleaner dashboard designed for
+            quick reviews and faster appointment handling.
+          </p>
         </div>
 
-        {/* Latest Bookings */}
-        <div className="bg-white shadow-md rounded-xl">
-          <div className="flex items-center gap-3 px-5 py-4 border-b rounded-t-xl bg-gray-50">
-            <img src={assets.list_icon} className="w-5" />
-            <p className="font-semibold text-gray-700">Latest Bookings</p>
-          </div>
-
-          <div className="divide-y">
-            {dashData.latestAppointments.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition"
-              >
-                {/* Left - Doctor Info */}
-                <div className="flex items-center gap-4">
-                  <img
-                    src={item.docData.image}
-                    alt=""
-                    className="w-14 h-14 rounded-full object-cover border"
-                  />
-
-                  <div>
-                    <p className="font-semibold text-gray-800">
-                      {item.docData.firstName} {item.docData.lastName}
-                    </p>
-                    <p className="text-sm text-gray-500">{item.slotDate}</p>
-                  </div>
-                </div>
-
-                {/* Right - Buttons */}
-                {!item.cancelled && (
-                  <button
-                    onClick={() => cancelAppointment(item._id)}
-                    className="px-4 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600"
-                  >
-                    Cancel
-                  </button>
-                )}
-
-                {item.cancelled && (
-                  <button
-                    disabled
-                    className="px-4 py-2 text-sm bg-gray-400 text-white rounded-md cursor-not-allowed"
-                  >
-                    Cancelled
-                  </button>
-                )}
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          {stats.map((stat) => (
+            <div key={stat.label} className="admin-stat-card flex items-center gap-4">
+              <div className="rounded-[24px] bg-white p-4 shadow-sm">
+                <img src={stat.icon} className="h-12 w-12" alt="" />
               </div>
-            ))}
+              <div>
+                <p className="text-3xl font-semibold text-slate-900">{stat.value}</p>
+                <p className="mt-1 text-sm font-medium text-slate-500">{stat.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="admin-panel px-6 py-6 sm:px-8">
+        <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
+          <img src={assets.list_icon} className="h-5 w-5" alt="" />
+          <div>
+            <h2 className="text-xl font-semibold text-slate-900">Latest bookings</h2>
+            <p className="text-sm text-slate-500">
+              Review the newest appointment activity and take action quickly.
+            </p>
           </div>
         </div>
-      </div>
-    )
+
+        <div className="mt-5 space-y-4">
+          {dashData.latestAppointments.map((item, index) => (
+            <div
+              key={index}
+              className="admin-table-row flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+            >
+              <div className="flex items-center gap-4">
+                <img
+                  src={item.docData.image}
+                  alt=""
+                  className="h-14 w-14 rounded-2xl border border-slate-200 object-cover"
+                />
+
+                <div>
+                  <p className="font-semibold text-slate-900">
+                    {item.docData.firstName} {item.docData.lastName}
+                  </p>
+                  <p className="text-sm text-slate-500">{item.slotDate}</p>
+                </div>
+              </div>
+
+              {!item.cancelled ? (
+                <button
+                  onClick={() => cancelAppointment(item._id)}
+                  className="admin-danger-btn"
+                >
+                  Cancel
+                </button>
+              ) : (
+                <span className="admin-chip bg-slate-100 text-slate-500">
+                  Cancelled
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 };
 

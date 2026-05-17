@@ -15,11 +15,10 @@ const Login = () => {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    if (state === "Sign Up") {
-      //  console.log("Sign Up:", { firstName, lastName, email, password });
 
+    if (state === "Sign Up") {
       try {
-        const { data } = await axios.post(backendUrl + "/api/user/register", {
+        const { data } = await axios.post(`${backendUrl}/api/user/register`, {
           firstName,
           lastName,
           email,
@@ -29,19 +28,16 @@ const Login = () => {
         if (data.success) {
           localStorage.setItem("token", data.token);
           setToken(data.token);
-          toast.success("user Registered Succesfully");
+          toast.success("User registered successfully");
         } else {
           toast.error(data.message);
         }
       } catch (err) {
-        console.log(err.message);
         toast.error(err.message);
       }
     } else {
-      // console.log("Login:", { email, password });
-
       try {
-        const { data } = await axios.post(backendUrl + "/api/user/login", {
+        const { data } = await axios.post(`${backendUrl}/api/user/login`, {
           email,
           password,
         });
@@ -49,12 +45,11 @@ const Login = () => {
         if (data.success) {
           localStorage.setItem("token", data.token);
           setToken(data.token);
-          toast.success("Login successfull");
+          toast.success("Login successful");
         } else {
           toast.error(data.message);
         }
       } catch (err) {
-        console.log(err.message);
         toast.error(err.message);
       }
     }
@@ -67,14 +62,14 @@ const Login = () => {
   }, [token]);
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center bg-gray-50">
-      <form
-        onSubmit={onSubmitHandler}
-        className="bg-white shadow-md rounded-2xl p-8 w-full max-w-md space-y-6"
-      >
-        <h2 className="text-3xl font-bold text-center text-blue-600">
+    <div className="flex min-h-[80vh] items-center justify-center">
+      <form onSubmit={onSubmitHandler} className="section-shell w-full max-w-md space-y-6 p-8">
+        <h2 className="text-center text-3xl font-semibold text-slate-900">
           {state === "Sign Up" ? "Create Account" : "Welcome Back"}
         </h2>
+        <p className="text-center text-sm text-slate-500">
+          Secure your appointments, manage your profile, and keep every visit in one place.
+        </p>
 
         {state === "Sign Up" && (
           <div className="flex gap-4">
@@ -83,7 +78,7 @@ const Login = () => {
               placeholder="First Name"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
-              className="w-1/2 border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-1/2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-sky-300 focus:bg-white"
               required
             />
             <input
@@ -91,7 +86,7 @@ const Login = () => {
               placeholder="Last Name"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
-              className="w-1/2 border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-1/2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-sky-300 focus:bg-white"
               required
             />
           </div>
@@ -102,7 +97,7 @@ const Login = () => {
           placeholder="Email Address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-sky-300 focus:bg-white"
           required
         />
 
@@ -111,34 +106,31 @@ const Login = () => {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 outline-none transition focus:border-sky-300 focus:bg-white"
           required
         />
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-        >
+        <button type="submit" className="primary-cta w-full">
           {state === "Sign Up" ? "Sign Up" : "Login"}
         </button>
 
-        <p className="text-center text-gray-600 text-sm">
+        <p className="text-center text-sm text-slate-600">
           {state === "Sign Up" ? (
             <>
               Already have an account?{" "}
               <span
                 onClick={() => setState("Login")}
-                className="text-blue-600 font-semibold cursor-pointer"
+                className="cursor-pointer font-semibold text-sky-700"
               >
                 Login
               </span>
             </>
           ) : (
             <>
-              Don’t have an account?{" "}
+              Don&apos;t have an account?{" "}
               <span
                 onClick={() => setState("Sign Up")}
-                className="text-blue-600 font-semibold cursor-pointer"
+                className="cursor-pointer font-semibold text-sky-700"
               >
                 Sign Up
               </span>

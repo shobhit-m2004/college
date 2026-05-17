@@ -67,9 +67,26 @@ def _load_local_env():
             load_dotenv(env_path, override=False)
 
 
-def get_groq_agent_status():
+def _get_setting(name, default=None):
     _load_local_env()
 
+    env_value = os.getenv(name)
+    if env_value:
+        return env_value
+
+    try:
+        import streamlit as st
+
+        secret_value = st.secrets.get(name)
+        if secret_value:
+            return secret_value
+    except Exception:
+        pass
+
+    return default
+
+
+def get_groq_agent_status():
     try:
         from groq import Groq  # noqa: F401
     except ImportError:
@@ -78,10 +95,10 @@ def get_groq_agent_status():
             "Groq agent is disabled. Install `groq` and `python-dotenv`, then restart Streamlit.",
         )
 
-    if not os.getenv("GROQ_API_KEY"):
+    if not _get_setting("GROQ_API_KEY"):
         return (
             False,
-            "Groq agent is disabled. Add your key to `Frontend/.env` as `GROQ_API_KEY=...`.",
+            "Groq agent is disabled. Add `GROQ_API_KEY` to `Frontend/.env` or Streamlit secrets.",
         )
 
     return True, "Groq agent is ready."
@@ -91,8 +108,6 @@ class GroqDiseaseAgentService:
     """Generate a richer patient-facing explanation from the ML prediction using Groq."""
 
     def __init__(self, model=None):
-        _load_local_env()
-
         try:
             from groq import Groq
         except ImportError as exc:
@@ -100,13 +115,13 @@ class GroqDiseaseAgentService:
                 "Missing dependency: install `groq` and `python-dotenv` to enable the Groq layer."
             ) from exc
 
-        api_key = os.getenv("GROQ_API_KEY")
+        api_key = _get_setting("GROQ_API_KEY")
         if not api_key:
             raise GroqConfigError(
-                "Missing `GROQ_API_KEY`. Paste your Groq key into `Frontend/.env` and rerun the app."
+                "Missing `GROQ_API_KEY`. Add it to `Frontend/.env` or Streamlit secrets and rerun the app."
             )
 
-        self.model = model or os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+        self.model = model or _get_setting("GROQ_MODEL", "llama-3.3-70b-versatile")
         self.client = Groq(api_key=api_key)
 
     def generate_explanation(

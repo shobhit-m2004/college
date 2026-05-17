@@ -1,0 +1,1 @@
+-r Multiple-Disease-Prediction-Webapp/Frontend/requirements.txt
